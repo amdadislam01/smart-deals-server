@@ -1,11 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const admin = require("firebase-admin");
 const port = process.env.PORT || 3000;
 
-const serviceAccount = require("./smart-deals-shop-firebase-admin.json");
+// index.js
+const decoded = Buffer.from(process.env.FIREBASE_SECRETE, "base64").toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -46,7 +49,7 @@ const verifyFirebaseToken = async (req, res, next) => {
 };
 
 const uri =
-  "mongodb+srv://smartdbUser:NAmEHQhJ6rpXIPqB@cluster0.cewig2g.mongodb.net/?appName=Cluster0";
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.cewig2g.mongodb.net/?appName=Cluster0`;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -194,7 +197,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
